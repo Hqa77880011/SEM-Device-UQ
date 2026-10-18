@@ -71,3 +71,11 @@ sem-uncertainty execute --input data/posterior_problem.json --output runs/execut
 ```
 
 The example is an explicit analytical/simulated input specification, not an experiment result. Replace it with the schema described above for application data. The execute path writes the actual selected actions, constraints, and mechanism metrics.
+
+## Selected reproduction setting
+
+Use the built-in analytic_mos adapter: width/length/oxide geometry in nm, a declared square-law/subthreshold current model in amperes, and the voltage grid in examples/analytic_posterior.json. The bundled boundary draws define a finite propagation problem, so proprietary TCAD is unnecessary. Four chains, 1000 warmup and 2000 retained states are the selected inference budget; diagnostics come from actual future runs. Custom adapter paths resolve relative to the input JSON.
+
+```bash
+python -m sem_uncertainty.cli execute --input examples/analytic_posterior.json --output runs/analytic
+```

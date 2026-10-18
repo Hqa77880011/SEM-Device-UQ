@@ -57,7 +57,14 @@ def posterior(problem,adapter):
 def execute(args):
     import json
     from pathlib import Path
-    problem=json.loads(Path(args.input).read_text());spec=importlib.util.spec_from_file_location('device_adapter',problem['adapter']);adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
+    problem=json.loads(Path(args.input).read_text())
+    if problem.get('adapter','analytic_mos')=='analytic_mos':
+        from .analytic_device import AnalyticDevice
+        adapter=AnalyticDevice(problem['voltage'])
+    else:
+        path=Path(problem['adapter'])
+        if not path.is_absolute():path=Path(args.input).resolve().parent/path
+        spec=importlib.util.spec_from_file_location('device_adapter',path);adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
     chains,curves,result=posterior(problem,adapter)
     if 'reference_curve' in problem:
         reference=np.asarray(problem['reference_curve']);result['iv_nrmse_percent']=float(100*np.sqrt(np.sum((curves.mean(0)-reference)**2)/max(np.sum(reference**2),1e-30)))
